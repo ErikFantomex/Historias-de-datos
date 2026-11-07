@@ -31,6 +31,7 @@ export class App {
   readonly selectedYear = signal('Todos');
   readonly selectedState = signal('Todos');
   readonly selectedCondition = signal('Todos');
+  readonly activeView = signal<'dashboard' | 'analysis'>('dashboard');
 
   readonly years = computed(() => ['Todos', ...new Set(this.records().map((row) => row.year).sort((a, b) => b - a).map(String))]);
   readonly states = computed(() => ['Todos', ...new Set(this.records().map((row) => row.state).sort())]);
@@ -103,5 +104,9 @@ export class App {
     this.selectedYear.set('Todos');
     this.selectedState.set('Todos');
     this.selectedCondition.set('Todos');
+  }
+
+  setView(view: 'dashboard' | 'analysis'): void {
+    this.activeView.set(view);
   }
 }

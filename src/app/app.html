@@ -7,7 +7,54 @@
     <div class="header-meta"><span class="live-dot"></span> México · 2011—2020</div>
   </header>
 
+  <nav class="view-nav" aria-label="Vistas del tablero">
+    <button [class.active]="activeView() === 'dashboard'" (click)="setView('dashboard')">Explorar datos</button>
+    <button [class.active]="activeView() === 'analysis'" (click)="setView('analysis')">Discusión y análisis</button>
+  </nav>
+
   <main>
+    @if (activeView() === 'analysis') {
+      <section class="analysis-hero">
+        <p class="eyebrow">Interpretar antes de concluir</p>
+        <h1>Lo que cuentan<br><em>los datos</em></h1>
+        <p class="intro">Respuestas a las preguntas de discusión a partir de los 152,374 registros de la base nacional 2011—2020.</p>
+      </section>
+
+      <section class="analysis-grid">
+        <article class="analysis-card analysis-wide">
+          <div class="card-number">01</div>
+          <div><h2>¿Qué preguntas podemos contestar?</h2>
+          <p>La base permite comparar registros por año, estado, edad, sexo y condición actual. Podemos identificar dónde se concentran los casos, cómo cambia el volumen anual, qué grupos de edad aparecen con mayor frecuencia y qué proporción fue localizada con vida, sin vida o permanece no localizada.</p>
+          <div class="answer-chips"><span>tendencias por año</span><span>perfiles por edad y sexo</span><span>comparaciones estatales</span></div></div>
+        </article>
+        <article class="analysis-card">
+          <div class="card-number">02</div><h2>¿Hay que dividirla?</h2>
+          <p><strong>Sí.</strong> La división principal debe ser por condición: desaparecidas y no localizadas, localizadas con vida y localizadas sin vida. También conviene separar por año, entidad, grupo de edad y sexo.</p>
+          <p class="muted">No se deben mezclar eventos con resultados distintos como si fueran un solo fenómeno.</p>
+        </article>
+        <article class="analysis-card">
+          <div class="card-number">03</div><h2>El contexto importa</h2>
+          <p>Un aumento de registros puede reflejar más casos, pero también cambios en la denuncia, captura institucional o incorporación de registros anteriores. Para comparar estados hay que considerar población, subregistro, capacidad de búsqueda y metodología.</p>
+        </article>
+      </section>
+
+      <section class="analysis-heading"><p class="eyebrow">Dos historias distintas</p><h2>Los perfiles cambian según el territorio</h2></section>
+      <section class="comparison-grid">
+        <article class="state-card edomex"><div class="state-card-top"><span>EDOMEX</span><strong>15,358</strong></div><h3>El reto: adolescentes y mujeres</h3><p>El 72.0% fue localizado con vida. Las mujeres son mayoría (8,511) y las edades más frecuentes son 14, 15, 16 y 17 años.</p><div class="mini-stat"><span>Localizadas con vida</span><strong>11,055 · 72.0%</strong></div><div class="mini-stat"><span>No localizadas</span><strong>3,696 · 24.1%</strong></div></article>
+        <article class="state-card jalisco"><div class="state-card-top"><span>JALISCO</span><strong>16,087</strong></div><h3>El reto: desaparición persistente</h3><p>Es el estado con más registros. El 62.2% permanece desaparecido o no localizado y los hombres representan 77.9% del total estatal.</p><div class="mini-stat"><span>No localizadas</span><strong>10,002 · 62.2%</strong></div><div class="mini-stat"><span>Localizadas sin vida</span><strong>807 · 5.0%</strong></div></article>
+      </section>
+
+      <section class="analysis-heading"><p class="eyebrow">Comparación nacional</p><h2>Desaparecidos vs. localizados sin vida</h2></section>
+      <section class="comparison-table panel">
+        <div class="comparison-row table-head"><span>Indicador</span><span>No localizadas</span><span>Localizadas sin vida</span></div>
+        <div class="comparison-row"><span>Total</span><strong>60,202</strong><strong>5,649</strong></div>
+        <div class="comparison-row"><span>Hombres</span><strong>75.8%</strong><strong>86.4%</strong></div>
+        <div class="comparison-row"><span>Mujeres</span><strong>23.8%</strong><strong>13.6%</strong></div>
+        <div class="comparison-row"><span>Grupo principal</span><strong>18–29 años</strong><strong>18–29 años</strong></div>
+        <div class="comparison-row"><span>Segundo grupo</span><strong>30–44 años</strong><strong>30–44 años</strong></div>
+      </section>
+      <section class="limits-note"><span>!</span><div><strong>Qué no puede responder esta base</strong><p>El XLSX no incluye municipio, fecha exacta, lugar de desaparición, causa, relación con el agresor ni tipo de violencia. Por eso describe patrones, pero no demuestra causas. Para obtener tasas por población habría que incorporar datos demográficos externos.</p></div></section>
+    } @else {
     <section class="hero">
       <div>
         <p class="eyebrow">Una mirada a los datos</p>
@@ -52,6 +99,7 @@
         <article class="panel gender-panel"><div class="panel-head"><div><h3>Una brecha visible</h3><p>Distribución por sexo</p></div></div><div class="gender-content"><div class="donut" [style.background]="'conic-gradient(#f074a8 0 ' + (total() ? women() / total() * 100 : 0) + '%, #5d75ef ' + (total() ? women() / total() * 100 : 0) + '% ' + (total() ? (women() + men()) / total() * 100 : 0) + '%, #a7afc3 0 100%)'"><div>{{ total() ? ((women() / total()) * 100 | number:'1.0-0') : 0 }}<small>%</small></div></div><div class="gender-legend">@for (item of genderSummary(); track item.label) { <div><span class="legend-dot" [style.background]="item.color"></span><span>{{ item.label }}</span><strong>{{ formatNumber(item.value) }}</strong></div> }</div></div></article>
         <article class="panel takeaway"><p class="eyebrow">Lectura rápida</p><h3>{{ topStates()[0]?.label || '—' }} encabeza los registros</h3><p>La información permite identificar patrones territoriales y temporales para orientar la búsqueda y la atención a familias.</p><div class="takeaway-line"></div><small>Usa los filtros para encontrar otra historia.</small></article>
       </section>
+    }
     }
   </main>
   <footer><span>Historias de datos · Visualización pública</span><span>Datos abiertos para entender, recordar y actuar.</span></footer>
