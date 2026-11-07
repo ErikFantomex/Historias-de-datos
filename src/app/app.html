@@ -1,0 +1,58 @@
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">H</div>
+      <div><strong>Historias de datos</strong><span>Observatorio de personas desaparecidas</span></div>
+    </div>
+    <div class="header-meta"><span class="live-dot"></span> México · 2011—2020</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Una mirada a los datos</p>
+        <h1>Personas desaparecidas<br><em>en México</em></h1>
+        <p class="intro">Explora cómo han cambiado los reportes, a quiénes afectan y dónde se concentra la búsqueda.</p>
+      </div>
+      <div class="hero-note"><span class="quote-mark">“</span><p>Detrás de cada número<br>hay una historia.</p></div>
+    </section>
+
+    @if (loading()) {
+      <div class="loading"><span class="spinner"></span> Preparando los datos...</div>
+    } @else if (loadError()) {
+      <div class="error">{{ loadError() }}</div>
+    } @else {
+      <section class="filters">
+        <div class="filter-label"><span class="filter-icon">⌕</span><span>Filtrar exploración</span></div>
+        <label>Año <select [value]="selectedYear()" (change)="setFilter('year', $any($event.target).value)">@for (year of years(); track year) { <option [value]="year">{{ year }}</option> }</select></label>
+        <label>Estado <select [value]="selectedState()" (change)="setFilter('state', $any($event.target).value)">@for (state of states(); track state) { <option [value]="state">{{ state }}</option> }</select></label>
+        <label>Condición <select [value]="selectedCondition()" (change)="setFilter('condition', $any($event.target).value)">@for (condition of conditions(); track condition) { <option [value]="condition">{{ condition === 'Todos' ? condition : condition.toLowerCase() }}</option> }</select></label>
+        <button class="clear-btn" (click)="clearFilters()">Restablecer <span>↺</span></button>
+      </section>
+
+      <section class="stat-grid">
+        <article class="stat-card highlight"><div class="stat-top"><span>REGISTROS ANALIZADOS</span><span class="stat-icon">◎</span></div><strong>{{ formatNumber(total()) }}</strong><p>personas en el periodo seleccionado</p><div class="spark orange"></div></article>
+        <article class="stat-card"><div class="stat-top"><span>MUJERES</span><span class="stat-icon pink">♀</span></div><strong>{{ formatNumber(women()) }}</strong><p>{{ total() ? ((women() / total()) * 100 | number:'1.0-1') : 0 }}% del total registrado</p><div class="spark pink-line"></div></article>
+        <article class="stat-card"><div class="stat-top"><span>HOMBRES</span><span class="stat-icon blue">♂</span></div><strong>{{ formatNumber(men()) }}</strong><p>{{ total() ? ((men() / total()) * 100 | number:'1.0-1') : 0 }}% del total registrado</p><div class="spark blue-line"></div></article>
+        <article class="stat-card"><div class="stat-top"><span>LOCALIZADAS</span><span class="stat-icon green">✓</span></div><strong>{{ locatedRate() }}<small>%</small></strong><p>{{ formatNumber(located()) }} personas localizadas</p><div class="progress"><span [style.width.%]="locatedRate()"></span></div></article>
+      </section>
+
+      <section class="section-heading"><div><p class="eyebrow">La historia en el tiempo</p><h2>Los reportes no han dejado de cambiar</h2></div><span class="source-tag">Fuente: RNPDNO · corte 2020</span></section>
+      <section class="panel trend-panel">
+        <div class="panel-head"><div><h3>Registros por año</h3><p>Personas reportadas según el año de registro</p></div><div class="legend"><span class="legend-dot"></span> Total de registros</div></div>
+        <div class="bar-chart"><div class="y-axis"><span>máximo</span><span>mitad</span><span>0</span></div><div class="bars">@for (item of yearsChart(); track item.year) { <div class="bar-column"><div class="bar-value">{{ formatNumber(item.value) }}</div><div class="bar" [style.height.%]="item.height"></div><span>{{ item.year }}</span></div> }</div></div>
+      </section>
+
+      <section class="two-col">
+        <article class="panel"><div class="panel-head"><div><h3>¿Dónde se concentra?</h3><p>Entidades con más registros</p></div><span class="mini-label">TOP 8</span></div><div class="rank-list">@for (item of stateChart(); track item.label; let i = $index) { <div class="rank-row"><span class="rank">{{ (i + 1).toString().padStart(2, '0') }}</span><span class="state-name">{{ item.label }}</span><div class="rank-track"><span [style.width.%]="(item.value / (stateChart()[0]?.value || 1)) * 100" [style.background]="item.color"></span></div><strong>{{ formatNumber(item.value) }}</strong></div> }</div></article>
+        <article class="panel"><div class="panel-head"><div><h3>Edades más afectadas</h3><p>Distribución por grupo de edad</p></div></div><div class="age-chart">@for (item of ageChart(); track item.label) { <div class="age-column"><div class="age-bar" [style.height.%]="item.height"></div><span>{{ item.label }}</span><small>{{ formatNumber(item.value) }}</small></div> }</div></article>
+      </section>
+
+      <section class="bottom-grid">
+        <article class="panel gender-panel"><div class="panel-head"><div><h3>Una brecha visible</h3><p>Distribución por sexo</p></div></div><div class="gender-content"><div class="donut" [style.background]="'conic-gradient(#f074a8 0 ' + (total() ? women() / total() * 100 : 0) + '%, #5d75ef ' + (total() ? women() / total() * 100 : 0) + '% ' + (total() ? (women() + men()) / total() * 100 : 0) + '%, #a7afc3 0 100%)'"><div>{{ total() ? ((women() / total()) * 100 | number:'1.0-0') : 0 }}<small>%</small></div></div><div class="gender-legend">@for (item of genderSummary(); track item.label) { <div><span class="legend-dot" [style.background]="item.color"></span><span>{{ item.label }}</span><strong>{{ formatNumber(item.value) }}</strong></div> }</div></div></article>
+        <article class="panel takeaway"><p class="eyebrow">Lectura rápida</p><h3>{{ topStates()[0]?.label || '—' }} encabeza los registros</h3><p>La información permite identificar patrones territoriales y temporales para orientar la búsqueda y la atención a familias.</p><div class="takeaway-line"></div><small>Usa los filtros para encontrar otra historia.</small></article>
+      </section>
+    }
+  </main>
+  <footer><span>Historias de datos · Visualización pública</span><span>Datos abiertos para entender, recordar y actuar.</span></footer>
+</div>
